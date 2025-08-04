@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ course_name }} | {{ lms_title }}</title>
+  <link href="https://vjs.zencdn.net/8.5.2/video-js.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/videojs-seek-buttons/dist/videojs-seek-buttons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #818cf8;
+      --secondary: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --bg-light: #fafbfc;
+      --bg-dark: #0a0f1c;
+      --sidebar-light: rgba(255, 255, 255, 0.95);
+      --sidebar-dark: rgba(15, 23, 42, 0.95);
+      --text-light: #1e293b;
+      --text-dark: #f1f5f9;
+      --text-muted-light: #64748b;
+      --text-muted-dark: #94a3b8;
+      --border-light: rgba(226, 232, 240, 0.7);
+      --border-dark: rgba(51, 65, 85, 0.7);
+      --shadow-dark: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+      --shadow-hover: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      height: 100vh;
+      position: relative;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    body.light { 
+      background-color: var(--bg-light); 
+      color: var(--text-light); 
+    }
+    
+    body.dark { 
+      background-color: var(--bg-dark); 
+      color: var(--text-dark); 
+    }
+    
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 2rem;
+    }
+
+    .player-header {
+      margin-bottom: 2rem;
+    }
+    
+    .player-header .course-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .player-header .video-title {
+      font-size: 1.1rem;
+      color: var(--text-muted-light);
+      font-weight: 500;
+    }
+    
+    .dark .player-header .video-title { 
+      color: var(--text-muted-dark); 
+    }
+    
+    .home-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    
+    .home-link:hover {
+      transform: translateX(-4px);
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-dark);
+      background: #000;
+      aspect-ratio: 16 / 9;
+    }
+
+    .video-js {
+      width: 100% !important;
+      height: 100% !important;
+      border-radius: 24px;
+    }
+    
+    .vjs-seek-button { 
+      font-size: 1.8em; 
+    }
+
+    .sidebar {
+      width: 400px;
+      background: var(--sidebar-light);
+      backdrop-filter: blur(20px);
+      border-left: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 10;
+    }
+    
+    .dark .sidebar { 
+      background: var(--sidebar-dark); 
+      border-left-color: var(--border-dark); 
+    }
+    
+    .sidebar.collapsed { 
+      margin-right: -400px; 
+    }
+
+    .sidebar-header {
+      padding: 2rem;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    
+    .dark .sidebar-header { 
+      border-bottom-color: var(--border-dark); 
+    }
+
+    .sidebar-title { 
+      font-size: 1.3rem; 
+      font-weight: 700; 
+    }
+    
+    .control-btn {
+      width: 40px; 
+      height: 40px; 
+      border: 1px solid var(--border-light);
+      border-radius: 12px; 
+      background: transparent; 
+      cursor: pointer;
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      transition: all 0.2s ease; 
+      font-size: 1.1rem; 
+      color: inherit;
+    }
+    
+    .dark .control-btn { 
+      border-color: var(--border-dark); 
+    }
+    
+    .control-btn:hover { 
+      background: var(--border-light); 
+      transform: scale(1.05);
+    }
+    
+    .dark .control-btn:hover { 
+      background: var(--border-dark); 
+    }
+
+    .playlist-content { 
+      flex: 1; 
+      overflow-y: auto; 
+      padding: 1rem; 
+    }
+    
+    .playlist-content::-webkit-scrollbar { 
+      width: 6px; 
+    }
+    
+    .playlist-content::-webkit-scrollbar-thumb { 
+      background: var(--primary); 
+      border-radius: 3px; 
+    }
+
+    .folder-header, .video-item {
+      display: flex; 
+      align-items: center; 
+      gap: 0.75rem;
+      padding: 0.875rem; 
+      border-radius: 12px;
+      cursor: pointer; 
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .folder-header { 
+      font-weight: 600; 
+      color: var(--text-light);
+    }
+    
+    .dark .folder-header {
+      color: var(--text-dark);
+    }
+    
+    .folder-icon { 
+      transition: transform 0.2s ease; 
+      font-size: 0.8rem;
+    }
+    
+    .folder-item.open > .folder-header .folder-icon { 
+      transform: rotate(90deg); 
+    }
+
+    .folder-children {
+      margin-left: 1.5rem; 
+      padding-left: 0.75rem;
+      border-left: 2px solid var(--border-light);
+      max-height: 0; 
+      overflow: hidden; 
+      transition: max-height 0.3s ease-out;
+    }
+    
+    .dark .folder-children { 
+      border-left-color: var(--border-dark); 
+    }
+    
+    .folder-item.open .folder-children { 
+      max-height: 2000px; 
+    }
+    
+    .video-item:hover { 
+      background-color: var(--border-light); 
+      transform: translateX(4px);
+    }
+    
+    .dark .video-item:hover { 
+      background-color: var(--border-dark); 
+    }
+    
+    .video-item.active { 
+      background: var(--gradient-primary) !important; 
+      color: white; 
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+    
+    .video-item.watched .video-name {
+      color: var(--text-muted-light);
+      text-decoration: line-through;
+    }
+    
+    .dark .video-item.watched .video-name { 
+      color: var(--text-muted-dark); 
+    }
+    
+    .video-item .video-icon {
+        transition: color 0.2s ease;
+    }
+
+    .video-item.watched .video-icon { 
+      color: var(--success); 
+    }
+    .video-item.active.watched .video-icon, .video-item.active .video-icon {
+      color: white;
+    }
+
+    .action-buttons {
+      position: fixed; 
+      top: 1.5rem; 
+      right: 1.5rem;
+      display: flex; 
+      gap: 0.75rem; 
+      z-index: 20;
+    }
+    
+    .action-btn {
+      width: 48px; 
+      height: 48px; 
+      border-radius: 16px;
+      background: var(--sidebar-light); 
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-light); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      cursor: pointer; 
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+      font-size: 1.1rem; 
+      color: inherit;
+      box-shadow: var(--shadow-dark);
+    }
+    
+    .dark .action-btn { 
+      background: var(--sidebar-dark); 
+      border-color: var(--border-dark); 
+    }
+    
+    .action-btn:hover { 
+      transform: scale(1.1); 
+      box-shadow: var(--shadow-hover);
+    }
+
+    .progress-bar {
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      height: 4px;
+      background: var(--gradient-primary);
+      z-index: 1000; 
+      transition: width 0.3s ease; 
+      width: 0;
+    }
+
+    @media (max-width: 1024px) {
+      body { 
+        flex-direction: column-reverse; 
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+      }
+      
+      .main-content {
+        overflow-y: visible;
+        padding: 1rem;
+        flex-grow: 1;
+      }
+      
+      .sidebar {
+        width: 100%; 
+        max-height: 50vh;
+        border-left: none;
+        border-top: 1px solid var(--border-light);
+        flex-shrink: 0;
+      }
+      
+      .dark .sidebar { 
+        border-top-color: var(--border-dark); 
+      }
+      
+      .sidebar.collapsed { 
+        display: none; 
+      }
+      
+      .action-buttons { 
+        top: 1rem; 
+        right: 1rem; 
+      }
+    }
+  </style>
+</head>
+<body class="light">
+  <div class="progress-bar" id="progress-bar"></div>
+  
+  <div class="action-buttons">
+    <button class="action-btn theme-toggle" onclick="toggleTheme()" title="Toggle Theme (Ctrl+T)">
+      <i class="fas fa-moon icon"></i>
+    </button>
+    <button class="action-btn" id="toggle-sidebar-btn" onclick="toggleSidebar()" title="Toggle Sidebar (Ctrl+B)">
+      <i class="fas fa-list"></i>
+    </button>
+  </div>
+
+  <main class="main-content">
+    <header class="player-header">
+      <a href="{{ url_for('home') }}" class="home-link">
+        <i class="fas fa-arrow-left"></i>
+        Back to Courses
+      </a>
+      <h1 class="course-title" id="course-title-header">{{ course_name }}</h1>
+      <p class="video-title" id="video-title-header">{{ first_video_title }}</p>
+    </header>
+    <div class="video-container">
+      <video id="video-player" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto">
+        <p class="vjs-no-js">
+          To view this video please enable JavaScript, and consider upgrading to a web browser that
+          <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>.
+        </p>
+      </video>
+    </div>
+  </main>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2 class="sidebar-title">Course Content</h2>
+      <button class="control-btn" onclick="toggleExpansion()" title="Expand/Collapse All (Ctrl+E)">
+        <i class="fas fa-folder-open" id="expand-icon"></i>
+      </button>
+    </div>
+    <div class="playlist-content" id="playlist"></div>
+  </aside>
+
+  <script src="https://vjs.zencdn.net/8.5.2/video.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/videojs-seek-buttons/dist/videojs-seek-buttons.min.js"></script>
+  
+  <script>
+    let player, allExpanded = true;
+    const courseData = {{ course|tojson }};
+    let progressData = {{ progress|tojson }};
+    let currentVideoId = null;
+    const courseName = '{{ course_name }}';
+    let flatVideoList = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeTheme();
+      flattenVideos(courseData);
+      renderPlaylist();
+      initializePlayer();
+      loadLastWatched();
+      updateProgress();
+      toggleExpansion(); // Collapse all by default
+    });
+
+    function initializePlayer() {
+      if (flatVideoList.length === 0) {
+        document.querySelector('.video-container').innerHTML = `
+          <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted-dark);background:black;border-radius:24px;font-size:1.2rem;">
+            <div style="text-align:center;">
+              <i class="fas fa-video-slash" style="font-size:3rem;margin-bottom:1rem;opacity:0.5;"></i>
+              <p>No playable videos found in this course.</p>
+            </div>
+          </div>`;
+        return;
+      }
+
+      player = videojs('video-player', {
+        fluid: true,
+        responsive: true,
+        playbackRates: [0.75, 1, 1.25, 1.5, 2],
+        controls: true,
+        plugins: {
+          seekButtons: { forward: 10, back: 10 }
+        }
+      });
+
+      player.on('ended', () => {
+        markAsWatched(currentVideoId);
+        playNextVideo();
+      });
+      
+      const firstVideo = flatVideoList[0];
+      loadVideo(firstVideo.id, firstVideo.full_path, firstVideo.name, true);
+    }
+
+    function flattenVideos(items) {
+      items.forEach(item => {
+        if (item.type === 'video') {
+          flatVideoList.push(item);
+        } else if (item.type === 'folder' && item.children) {
+          flattenVideos(item.children);
+        }
+      });
+    }
+    
+    function playNextVideo() {
+      const currentIndex = flatVideoList.findIndex(v => v.id === currentVideoId);
+      if (currentIndex > -1 && currentIndex < flatVideoList.length - 1) {
+        const nextVideo = flatVideoList[currentIndex + 1];
+        loadVideo(nextVideo.id, nextVideo.full_path, nextVideo.name);
+      } else {
+        console.log("End of course.");
+      }
+    }
+
+    function renderPlaylist() {
+      const playlist = document.getElementById('playlist');
+      playlist.innerHTML = courseData.map(createPlaylistItem).join('');
+      attachEventListeners();
+      updatePlaylistUI();
+    }
+    
+    function createPlaylistItem(item) {
+      if (item.type === 'folder') {
+        return `
+          <div class="folder-item">
+            <div class="folder-header">
+              <i class="fas fa-chevron-right folder-icon"></i>
+              <span class="folder-name">${item.name}</span>
+            </div>
+            <div class="folder-children">
+              ${item.children.map(createPlaylistItem).join('')}
+            </div>
+          </div>
+        `;
+      } else if (item.type === 'video') {
+        return `
+          <div class="video-item" data-id="${item.id}" data-full-path="${item.full_path}">
+            <i class="fas fa-play-circle video-icon"></i>
+            <span class="video-name">${item.name}</span>
+          </div>
+        `;
+      }
+      return '';
+    }
+
+    function attachEventListeners() {
+      document.querySelectorAll('.folder-header').forEach(header => {
+        header.addEventListener('click', () => header.parentElement.classList.toggle('open'));
+      });
+      document.querySelectorAll('.video-item').forEach(item => {
+        item.addEventListener('click', () => {
+          loadVideo(item.dataset.id, item.dataset.fullPath, item.querySelector('.video-name').textContent);
+        });
+      });
+    }
+
+    function updatePlaylistUI() {
+      document.querySelectorAll('.video-item').forEach(item => {
+        const id = item.dataset.id;
+        const isWatched = !!progressData[id];
+        const isActive = id === currentVideoId;
+        
+        item.classList.toggle('watched', isWatched);
+        item.classList.toggle('active', isActive);
+        
+        const icon = item.querySelector('.video-icon');
+        icon.className = `fas ${isWatched ? 'fa-check-circle' : 'fa-play-circle'} video-icon`;
+        
+        if(isActive) {
+          const sidebar = document.getElementById('sidebar');
+          if(!sidebar.classList.contains('collapsed')) {
+            item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          item.closest('.folder-item')?.classList.add('open');
+        }
+      });
+    }
+
+    function loadVideo(id, fullPath, name, isInitialLoad = false) {
+      if (!id || !fullPath) return;
+      if (!isInitialLoad && id === currentVideoId) return;
+
+      currentVideoId = id;
+      document.getElementById('video-title-header').textContent = name;
+      updatePlaylistUI();
+
+      if (player) {
+        player.src({ type: 'video/mp4', src: `/video/${fullPath}` });
+        player.ready(() => player.play());
+      }
+    }
+
+    function markAsWatched(videoId) {
+      if (!videoId || progressData[videoId]) return;
+      
+      fetch('/mark_watched', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: videoId, course: courseName })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          progressData[videoId] = true;
+          updateProgress();
+          updatePlaylistUI();
+        }
+      });
+    }
+
+    function updateProgress() {
+      const watchedCount = flatVideoList.filter(v => progressData[v.id]).length;
+      const totalVideos = flatVideoList.length;
+      const progress = totalVideos > 0 ? (watchedCount / totalVideos) * 100 : 0;
+      document.getElementById('progress-bar').style.width = `${progress}%`;
+    }
+
+    function loadLastWatched() {
+      fetch(`/last_watched/${courseName}`)
+        .then(res => res.json())
+        .then(data => {
+          const lastVideoId = data.id;
+          if (lastVideoId && lastVideoId !== currentVideoId) {
+            const lastVideo = flatVideoList.find(v => v.id === lastVideoId);
+            if(lastVideo) {
+              loadVideo(lastVideo.id, lastVideo.full_path, lastVideo.name);
+            }
+          }
+        });
+    }
+
+    function toggleExpansion() {
+      allExpanded = !allExpanded;
+      document.querySelectorAll('.folder-item').forEach(f => f.classList.toggle('open', allExpanded));
+      document.getElementById('expand-icon').className = allExpanded ? 'fas fa-folder' : 'fas fa-folder-open';
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('collapsed');
+    }
+
+    function toggleTheme() {
+      const body = document.body;
+      const isDark = body.classList.contains('dark');
+      body.classList.toggle('dark', !isDark);
+      body.classList.toggle('light', isDark);
+      localStorage.setItem("theme", isDark ? "light" : "dark");
+      
+      const icon = document.querySelector('.theme-toggle .icon');
+      icon.className = isDark ? 'fas fa-moon icon' : 'fas fa-sun icon';
+    }
+
+    function initializeTheme() {
+      const savedTheme = localStorage.getItem("theme") || (window.matchMedia('(prefers-color-scheme: dark)').matches ? "dark" : "light");
+      document.body.classList.add(savedTheme);
+      document.querySelector('.theme-toggle .icon').className = savedTheme === 'dark' ? 'fas fa-sun icon' : 'fas fa-moon icon';
+    }
+
+    document.addEventListener('keydown', e => {
+      if (document.activeElement.tagName === 'INPUT' || document.activeElement.isContentEditable) return;
+
+      if (e.ctrlKey) {
+        if (e.key === 'b') { e.preventDefault(); toggleSidebar(); }
+        if (e.key === 't') { e.preventDefault(); toggleTheme(); }
+        if (e.key === 'e') { e.preventDefault(); toggleExpansion(); }
+        return;
+      }
+
+      if (player && player.isReady_ && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        switch (e.key) {
+          case ' ': case 'k': e.preventDefault(); player.paused() ? player.play() : player.pause(); break;
+          case 'ArrowLeft': e.preventDefault(); player.currentTime(player.currentTime() - 10); break;
+          case 'ArrowRight': e.preventDefault(); player.currentTime(player.currentTime() + 10); break;
+          case 'ArrowUp': e.preventDefault(); player.volume(Math.min(1, player.volume() + 0.1)); break;
+          case 'ArrowDown': e.preventDefault(); player.volume(Math.max(0, player.volume() - 0.1)); break;
+          case 'f': e.preventDefault(); player.isFullscreen() ? player.exitFullscreen() : player.requestFullscreen(); break;
+          case 'm': e.preventDefault(); player.muted(!player.muted()); break;
+        }
+      }
+    });
+  </script>
+</body>
+</html>

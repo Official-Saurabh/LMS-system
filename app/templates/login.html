@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | {{ lms_title }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #818cf8;
+      --secondary: #8b5cf6;
+      --accent: #06b6d4;
+      --error: #ef4444;
+      --bg-light: #fafbfc;
+      --bg-dark: #0a0f1c;
+      --surface-light: rgba(255, 255, 255, 0.95);
+      --surface-dark: rgba(15, 23, 42, 0.95);
+      --text-light: #1e293b;
+      --text-dark: #f1f5f9;
+      --text-muted-light: #64748b;
+      --text-muted-dark: #94a3b8;
+      --border-light: rgba(226, 232, 240, 0.8);
+      --border-dark: rgba(51, 65, 85, 0.8);
+      --shadow-light: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+      --shadow-dark: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+      --shadow-hover: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    body.light { 
+      background-color: var(--bg-light); 
+      color: var(--text-light); 
+    }
+    
+    body.dark { 
+      background-color: var(--bg-dark); 
+      color: var(--text-dark); 
+    }
+    
+    .background-gradient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+    
+    .light .background-gradient {
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 60%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+    }
+    
+    .dark .background-gradient {
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 40% 60%, rgba(6, 182, 212, 0.15) 0%, transparent 50%);
+    }
+
+    .login-container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 450px;
+      padding: 1.5rem;
+    }
+
+    .login-card {
+      background: var(--surface-light);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-light);
+      border-radius: 28px;
+      padding: 3rem;
+      box-shadow: var(--shadow-light);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .dark .login-card {
+      background: var(--surface-dark);
+      border-color: var(--border-dark);
+      box-shadow: var(--shadow-dark);
+    }
+
+    .login-header { 
+      text-align: center; 
+      margin-bottom: 2.5rem; 
+    }
+    
+    .login-icon {
+      width: 72px; 
+      height: 72px; 
+      margin: 0 auto 2rem;
+      background: var(--gradient-primary);
+      border-radius: 20px;
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      font-size: 2rem; 
+      color: white;
+      box-shadow: 0 12px 24px rgba(99, 102, 241, 0.3);
+    }
+    
+    .login-title { 
+      font-size: 2rem; 
+      font-weight: 700; 
+      margin-bottom: 0.75rem; 
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .login-subtitle { 
+      font-size: 1rem; 
+      color: var(--text-muted-light); 
+      font-weight: 400;
+    }
+    
+    .dark .login-subtitle { 
+      color: var(--text-muted-dark); 
+    }
+    
+    .form-group { 
+      margin-bottom: 1.5rem; 
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      font-size: 1rem;
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      background: transparent;
+      color: inherit;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      font-weight: 500;
+    }
+    
+    .dark .form-input { 
+      border-color: var(--border-dark); 
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+      transform: translateY(-2px);
+    }
+    
+    .form-input::placeholder { 
+      color: var(--text-muted-light); 
+      font-weight: 400;
+    }
+    
+    .dark .form-input::placeholder { 
+      color: var(--text-muted-dark); 
+    }
+
+    .login-button {
+      width: 100%; 
+      padding: 1rem 1.5rem; 
+      font-size: 1rem; 
+      font-weight: 600;
+      color: white;
+      background: var(--gradient-primary);
+      border: none; 
+      border-radius: 16px; 
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-top: 0.5rem;
+    }
+    
+    .login-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4);
+    }
+    
+    .login-button:active {
+      transform: translateY(-1px);
+    }
+
+    .alert {
+      padding: 1.25rem; 
+      border-radius: 16px; 
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem; 
+      font-weight: 500;
+      display: flex; 
+      align-items: center; 
+      gap: 0.75rem;
+      border: 1px solid;
+    }
+    
+    .alert-danger {
+      background: rgba(239, 68, 68, 0.1); 
+      color: var(--error);
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .theme-toggle {
+      position: fixed; 
+      top: 2rem; 
+      right: 2rem; 
+      width: 56px; 
+      height: 56px;
+      border-radius: 16px; 
+      background: var(--surface-light); 
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-light); 
+      display: flex; 
+      align-items: center;
+      justify-content: center; 
+      cursor: pointer; 
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100; 
+      box-shadow: var(--shadow-light);
+    }
+    
+    .dark .theme-toggle { 
+      background: var(--surface-dark); 
+      border-color: var(--border-dark); 
+      box-shadow: var(--shadow-dark); 
+    }
+    
+    .theme-toggle:hover { 
+      transform: scale(1.05) rotate(5deg); 
+      box-shadow: var(--shadow-hover);
+    }
+    
+    .theme-toggle .icon { 
+      font-size: 1.25rem; 
+      transition: transform 0.3s ease; 
+    }
+    
+    .dark .theme-toggle .icon { 
+      transform: rotate(180deg); 
+    }
+
+    .loading { 
+      opacity: 0; 
+      animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+    }
+    
+    @keyframes fadeIn { 
+      to { 
+        opacity: 1; 
+        transform: translateY(0);
+      } 
+    }
+    
+    .form-input, .login-button {
+      animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    
+    .form-input:nth-child(1) { animation-delay: 0.1s; }
+    .form-input:nth-child(2) { animation-delay: 0.2s; }
+    .login-button { animation-delay: 0.3s; }
+    
+    @keyframes slideInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body class="light">
+  <div class="background-gradient"></div>
+
+  <div class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+    <i class="fas fa-moon icon"></i>
+  </div>
+
+  <div class="login-container loading">
+    <div class="login-card">
+      <header class="login-header">
+        <div class="login-icon">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <h1 class="login-title">Welcome Back</h1>
+        <p class="login-subtitle">Sign in to access your learning dashboard</p>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="post">
+        <div class="form-group">
+          <input type="text" name="username" class="form-input" placeholder="Enter your username" required autocomplete="username"/>
+        </div>
+        <div class="form-group">
+          <input type="password" name="password" class="form-input" placeholder="Enter your password" required autocomplete="current-password"/>
+        </div>
+        <button type="submit" class="login-button">
+          <i class="fas fa-sign-in-alt" style="margin-right: 0.5rem;"></i>
+          Sign In
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      const body = document.body;
+      const isDark = body.classList.contains('dark');
+      body.classList.toggle('dark', !isDark);
+      body.classList.toggle('light', isDark);
+      localStorage.setItem("theme", isDark ? "light" : "dark");
+      
+      const icon = document.querySelector('.theme-toggle .icon');
+      icon.className = isDark ? 'fas fa-moon icon' : 'fas fa-sun icon';
+    }
+
+    function initializeTheme() {
+      const savedTheme = localStorage.getItem("theme");
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? "dark" : "light");
+      
+      const body = document.body;
+      body.classList.remove('light', 'dark');
+      body.classList.add(theme);
+
+      const icon = document.querySelector('.theme-toggle .icon');
+      icon.className = theme === 'dark' ? 'fas fa-sun icon' : 'fas fa-moon icon';
+    }
+    
+    document.addEventListener("DOMContentLoaded", initializeTheme);
+  </script>
+</body>
+</html>
