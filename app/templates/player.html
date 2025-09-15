@@ -10,26 +10,24 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
     :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --primary-light: #818cf8;
-      --secondary: #8b5cf6;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --error: #ef4444;
-      --bg-light: #fafbfc;
-      --bg-dark: #0a0f1c;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #3b82f6;
+      --success: #059669;
+      --warning: #d97706;
+      --error: #dc2626;
+      --bg-light: #ffffff;
+      --bg-dark: #0f0f23;
       --sidebar-light: rgba(255, 255, 255, 0.95);
       --sidebar-dark: rgba(15, 23, 42, 0.95);
-      --text-light: #1e293b;
-      --text-dark: #f1f5f9;
-      --text-muted-light: #64748b;
-      --text-muted-dark: #94a3b8;
-      --border-light: rgba(226, 232, 240, 0.7);
-      --border-dark: rgba(51, 65, 85, 0.7);
-      --shadow-dark: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
-      --shadow-hover: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-      --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      --text-light: #171717;
+      --text-dark: #ffffff;
+      --text-muted-light: #525252;
+      --text-muted-dark: #a3a3a3;
+      --border-light: rgba(229, 229, 229, 0.7);
+      --border-dark: rgba(38, 38, 38, 0.7);
+      --shadow-dark: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -59,7 +57,7 @@
       display: flex;
       flex-direction: column;
       overflow-y: auto;
-      padding: 2rem;
+      padding: 1.5rem;
     }
 
     .player-header {
@@ -67,19 +65,20 @@
     }
     
     .player-header .course-title {
-      font-size: 1.75rem;
-      font-weight: 700;
+      font-size: 1.5rem;
+      font-weight: 600;
       margin-bottom: 0.5rem;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--text-light);
+    }
+    
+    .dark .player-header .course-title {
+      color: var(--text-dark);
     }
     
     .player-header .video-title {
-      font-size: 1.1rem;
+      font-size: 1rem;
       color: var(--text-muted-light);
-      font-weight: 500;
+      font-weight: 400;
     }
     
     .dark .player-header .video-title { 
@@ -105,7 +104,7 @@
     .video-container {
       position: relative;
       width: 100%;
-      border-radius: 24px;
+      border-radius: 16px;
       overflow: hidden;
       box-shadow: var(--shadow-dark);
       background: #000;
@@ -115,7 +114,7 @@
     .video-js {
       width: 100% !important;
       height: 100% !important;
-      border-radius: 24px;
+      border-radius: 16px;
     }
     
     .vjs-seek-button { 
@@ -143,7 +142,7 @@
     }
 
     .sidebar-header {
-      padding: 2rem;
+      padding: 1.5rem;
       border-bottom: 1px solid var(--border-light);
       display: flex;
       justify-content: space-between;
@@ -156,26 +155,22 @@
     }
 
     .sidebar-title { 
-      font-size: 1.3rem; 
-      font-weight: 700; 
+      font-size: 1.125rem; 
+      font-weight: 600; 
     }
     
     .control-btn {
       width: 40px; 
       height: 40px; 
       border: 1px solid var(--border-light);
-      border-radius: 12px; 
+      border-radius: 10px; 
       background: transparent; 
       cursor: pointer;
       display: flex; 
       align-items: center; 
-      justify-content: center;
-      transition: all 0.2s ease; 
-      font-size: 1.1rem; 
-      color: inherit;
-    }
-    
-    .dark .control-btn { 
+      justify-content: center; 
+      transition: all 0.2s ease;
+    }    .dark .control-btn { 
       border-color: var(--border-dark); 
     }
     
@@ -297,31 +292,17 @@
     .action-btn {
       width: 48px; 
       height: 48px; 
-      border-radius: 16px;
+      border-radius: 12px;
       background: var(--sidebar-light); 
       backdrop-filter: blur(20px);
       border: 1px solid var(--border-light); 
       display: flex; 
       align-items: center; 
-      justify-content: center;
+      justify-content: center; 
       cursor: pointer; 
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-      font-size: 1.1rem; 
-      color: inherit;
-      box-shadow: var(--shadow-dark);
-    }
-    
-    .dark .action-btn { 
-      background: var(--sidebar-dark); 
-      border-color: var(--border-dark); 
-    }
-    
-    .action-btn:hover { 
-      transform: scale(1.1); 
-      box-shadow: var(--shadow-hover);
-    }
-
-    .progress-bar {
+      transition: all 0.2s ease; 
+      color: var(--text-light);
+    }    .progress-bar {
       position: fixed; 
       top: 0; 
       left: 0; 
@@ -555,7 +536,18 @@
       updatePlaylistUI();
 
       if (player) {
-        player.src({ type: 'video/mp4', src: `/video/${fullPath}` });
+        const ext = (fullPath.split('.').pop() || '').toLowerCase();
+        let mime = 'video/mp4';
+        if (ext === 'webm') mime = 'video/webm';
+        else if (ext === 'ogv' || ext === 'ogg') mime = 'video/ogg';
+        else if (ext === 'mkv') mime = 'video/x-matroska';
+        else if (ext === 'mov') mime = 'video/quicktime';
+        else if (ext === 'wmv') mime = 'video/x-ms-wmv';
+        else if (ext === 'flv') mime = 'video/x-flv';
+        else if (ext === 'avi') mime = 'video/x-msvideo';
+
+        const encodedPath = encodeURIComponent(fullPath);
+        player.src({ type: mime, src: `/video/${encodedPath}` });
         player.ready(() => player.play());
       }
     }

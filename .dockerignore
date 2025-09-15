@@ -1,0 +1,49 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Venvs
+.venv/
+venv/
+ENV/
+
+# Node
+node_modules/
+
+# IDE/editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local data and big archives (keep image small)
+progress.json
+imported_courses.json
+course_paths.txt
+courses/
+*.rar
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.tgz
+*.iso
+
+# Logs
+*.log
+
+# Misc
+*.bak
+*.tmp
+

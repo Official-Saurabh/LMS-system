@@ -1,1 +1,3 @@
 docker = D:\Docker\courses\Udemy - Docker and Kubernetes for beginners  DevOps journey 2025-5
+web scraping = E:\StudyMaterial\web\Jakob Greenfeld – Scraping The Web For Fun and Profi.zip\Jakob Greenfeld – Scraping The Web For Fun and Profit
+api = E:\StudyMaterial\[FreeCoursesOnline.Me] TCM - Practical API Hacking
